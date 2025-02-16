@@ -129,12 +129,21 @@ func extractLinksFromRSS(body []byte) []RSSItem {
 }
 
 func cleanSent() {
-	expiration := time.Now().Add(-120 * time.Hour).Unix() // 5 days
-	keys, _ := rdb.Keys(ctx, "sent:*").Result()
+	keys, err := rdb.Keys(ctx, "sent:*").Result()
+	if err != nil {
+		log.Printf("Failed to fetch sent keys: %v", err)
+		return
+	}
 	for _, key := range keys {
-		timestamp, _ := rdb.Get(ctx, key).Int64()
-		if timestamp < expiration {
+		ttl, err := rdb.TTL(ctx, key).Result()
+		if err != nil {
+			log.Printf("Error fetching TTL for key %s: %v", key, err)
+			continue
+		}
+		// If TTL is <= 0, the key is either expired or has no expiration set
+		if ttl <= 0 {
 			rdb.Del(ctx, key)
 		}
 	}
 }
+

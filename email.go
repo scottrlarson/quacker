@@ -26,7 +26,7 @@ func generateEmailHTML(domain, post, unsubscribeLink, imageURL string) string {
 		<p style="font-size:small;">You are receiving this email because you subscribed to updates from %s. If you no longer wish to receive these emails, you can <a href="%s">unsubscribe here</a>.</p>
 		</body>
 		</html>`,
-			post, post, domain, domain, unsubscribeLink,
+			post, post, domain, unsubscribeLink,
 	)
 
 	return emailBody
