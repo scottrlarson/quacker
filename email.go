@@ -11,23 +11,29 @@ import (
 	"strings"
 )
 
-func generateEmailHTML(domain, post, unsubscribeLink, imageURL string) string {
-	// Generate the HTML content for the email
+func generateEmailHTML(domain, title, link, unsubscribeLink, imageURL string) string {
+	// Start the HTML email content
 	emailBody := `<html>
-		<body>`
+	<body>`
 
-	// If an image URL is provided, include it above the post link
+	// If an image URL is provided, include it at the top
 	if imageURL != "" {
 		emailBody += fmt.Sprintf(`<img src="%s" alt="Post Image" style="max-width:400px; width:100%%; height:auto; display:block; margin:0 auto;"/><br>`, imageURL)
 	}
 
-	emailBody += fmt.Sprintf(
-		`<p><a href="%s">%s</a></p>
-		<p style="font-size:small;">You are receiving this email because you subscribed to updates from %s. If you no longer wish to receive these emails, you can <a href="%s">unsubscribe here</a>.</p>
-		</body>
-		</html>`,
-			post, post, domain, unsubscribeLink,
-	)
+	// Include the title as a header
+	emailBody += fmt.Sprintf(`<h1>%s</h1>`, title)
+	// Provide a clickable link to the post
+	emailBody += fmt.Sprintf(`<p>Read the full post here: <a href="%s">%s</a></p>`, link, link)
+
+	// Include the unsubscribe link and additional info
+	emailBody += fmt.Sprintf(`
+		<p style="font-size:small;">
+			You are receiving this email because you subscribed to updates from %s. 
+			If you no longer wish to receive these emails, you can <a href="%s">unsubscribe here</a>.
+		</p>
+	</body>
+</html>`, domain, unsubscribeLink)
 
 	return emailBody
 }

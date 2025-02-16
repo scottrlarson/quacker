@@ -24,11 +24,16 @@ type RSS struct {
 	} `xml:"channel"`
 }
 
+type Enclosure struct {
+    URL  string `xml:"url,attr"`
+    Type string `xml:"type,attr"`
+}
+
 type RSSItem struct {
-	Title    string `xml:"title"`
-	Link     string `xml:"link"`
-	PubDate  string `xml:"pubDate"`
-	ImageURL string `xml:"enclosure" attr:"url"`
+    Title     string    `xml:"title"`
+    Link      string    `xml:"link"`
+    PubDate   string    `xml:"pubDate"`
+    Enclosure Enclosure `xml:"enclosure"`
 }
 
 func job() {
@@ -74,7 +79,7 @@ func job() {
 				}
 
 				unsubscribeLink := fmt.Sprintf("https://%s/unsubscribe?email=%s&domain=%s&owner=%s", domain, url.QueryEscape(subscriber), domain, owner)
-				emailHTML := generateEmailHTML(domain, post.Link, unsubscribeLink, post.ImageURL)
+				emailHTML := generateEmailHTML(domain, post.Title, post.Link, unsubscribeLink, post.Enclosure.URL)
 				emailLogger.Printf("Preparing to send email to: %s\n", subscriber)
 				if err := sendEmail(subscriber, domain, post.Link, emailHTML, owner); err == nil {
 					rdb.SAdd(ctx, sentKey, post.Link)

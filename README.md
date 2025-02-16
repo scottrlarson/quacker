@@ -62,7 +62,6 @@ Redis is used for application data storage.
     # Redirect HTTP to HTTPS
     return 301 https://$host$request_uri;
    }
-   
    ```
 
 7. Enable the domain
