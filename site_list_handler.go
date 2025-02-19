@@ -69,10 +69,10 @@ func siteListPage(w http.ResponseWriter, r *http.Request) {
 			content += fmt.Sprintf(`<tr>
 				<td>%s</td>
 				<td>
-					<a href="/js/%s" class="btn btn-info btn-sm">Copy Subscribe Button</a>
-					<a href="/editsite?domain=%s" class="btn btn-warning btn-sm">Edit</a>
+					<a href="/js/%s" class="btn btn-secondary btn-sm">View HTML</a>
+					<a href="/editsite?domain=%s" class="btn btn-secondary btn-sm">Edit</a>
+					<a href="/downloadsubscribers?domain=%s" class="btn btn-secondary btn-sm">Subscribers</a>
 					<button class="btn btn-danger btn-sm" onclick="confirmDelete('%s')">Delete</button>
-					<a href="/downloadsubscribers?domain=%s" class="btn btn-secondary btn-sm">Download Subscribers</a>
 				</td>
 			</tr>`, domain, domain, domain, domain, domain)
 		}
