@@ -70,11 +70,11 @@ func job() {
 					jobLogger.Printf("Skipping duplicate email for %s (post: %s)\n", subscriber, post.Link)
 					continue
 				}
-
+				
 				jobLogger.Printf("Checking subscriber: %s\n", subscriber)
-				if !validateEmailMX(subscriber) {
+				if isSpamDomain(subscriber) || !validateEmailMX(subscriber) {
 					rdb.SRem(ctx, "subs:"+owner+":"+domain, subscriber)
-					emailLogger.Printf("Removed invalid email: %s for site %s\n", subscriber, domain)
+					emailLogger.Printf("Removed spam or invalid email: %s for site %s\n", subscriber, domain)
 					continue
 				}
 
@@ -100,6 +100,17 @@ func validateEmailMX(email string) bool {
 	domain := strings.Split(email, "@")[1]
 	mxRecords, err := net.LookupMX(domain)
 	return err == nil && len(mxRecords) > 0
+}
+
+func isSpamDomain(email string) bool {
+	domain := strings.Split(email, "@")[1]
+	spamDomains := []string{"dont-reply.me", "do-not-respond.me"}
+	for _, spam := range spamDomains {
+		if domain == spam {
+			return true
+		}
+	}
+	return false
 }
 
 func fetchRSS(domain string) []RSSItem {
