@@ -70,10 +70,17 @@ func job() {
 					jobLogger.Printf("Skipping duplicate email for %s (post: %s)\n", subscriber, post.Link)
 					continue
 				}
-				
+
 				jobLogger.Printf("Checking subscriber: %s\n", subscriber)
 				if isSpamDomain(subscriber) || !validateEmailMX(subscriber) {
-					rdb.SRem(ctx, "subs:"+owner+":"+domain, subscriber)
+					removed, err := rdb.SRem(ctx, "subs:"+owner+":"+domain, subscriber).Result()
+					if err != nil {
+						jobLogger.Printf("Error removing subscriber %s: %v\n", subscriber, err)
+					} else if removed == 0 {
+						jobLogger.Printf("Warning: Tried to remove %s but it was not found in Redis.\n", subscriber)
+					} else {
+						jobLogger.Printf("Successfully removed spam or invalid subscriber: %s\n", subscriber)
+					}
 					emailLogger.Printf("Removed spam or invalid email: %s for site %s\n", subscriber, domain)
 					continue
 				}
@@ -95,7 +102,6 @@ func job() {
 	cleanSent()
 }
 
-
 func validateEmailMX(email string) bool {
 	domain := strings.Split(email, "@")[1]
 	mxRecords, err := net.LookupMX(domain)
@@ -112,6 +118,7 @@ func isSpamDomain(email string) bool {
 	}
 	return false
 }
+
 
 func fetchRSS(domain string) []RSSItem {
 	resp, err := http.Get("https://" + domain + "/rss")
