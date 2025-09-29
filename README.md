@@ -55,7 +55,7 @@ Redis is used for application data storage.
 
 6. Add this to the file
    ```bash
-  server {
+    server {
     listen 80;
     server_name quacker.eu;
 
